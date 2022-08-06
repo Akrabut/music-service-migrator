@@ -1,4 +1,4 @@
-"https://listen.tidal.com/v1/users/186299160/favorites/tracks?countryCode=IL&locale=en_US&deviceType=BROWSER", {
+"https://listen.tidal.com/v1/users/yea/favorites/tracks?countryCode=IL&locale=en_US&deviceType=BROWSER", {
   "credentials": "include",
   "headers": {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:103.0) Gecko/20100101 Firefox/103.0",

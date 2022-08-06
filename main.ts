@@ -10,13 +10,13 @@ const URLS = {
   // you may changed useless params such as countryCode etc, but the request is rejected without them
   tidalSearchAPIURL: (trackName: string) => `${BASE_TIDAL_URL}/v1/search/top-hits?query=${trackName}&limit=3&offset=0&types=ARTISTS,ALBUMS,TRACKS,VIDEOS,PLAYLISTS&includeContributors=true&countryCode=IL&locale=en_US&deviceType=BROWSER`,
   // used to filter out tracks that are already in your collection
-  // mind the paging
-  COLLECTION_API: '',
-  // used to add tracks to your collection
-  COLLECTION_ADD_API: '',
+  // note the 5000 limit - its not validated server side, so you're free to set whatever you want
+  collectionAPIURL: () => `https://listen.tidal.com/v1/users/${USER_ID}/favorites/tracks?offset=0&limit=5000&order=DATE&orderDirection=DESC&countryCode=IL&locale=en_US&deviceType=BROWSER`,
   generateTrackURLFromID: (id: number) => `${BASE_TIDAL_URL}/track/${id}`,
   addToCollection: () => `${BASE_TIDAL_URL}/v1/users/${USER_ID}/favorites/tracks?countryCode=IL&locale=en_US&deviceType=BROWSER`,
 };
+
+const failedIDRequests: string[] = [];
 
 // THIS IS WINDOWS FORMATING - change to unix if not on windows
 const TARGET_FOLDER_PATH = `C:\\Users\\admag\\Desktop\\Music`
@@ -44,14 +44,15 @@ async function getTrackIds(trackList: string[]) {
       });
       const data = await response.json();
 
-      if (!track.toLowerCase().includes(data.tracks.items[0].title.toLowerCase())) {
-        throw new Error(`Looked for ${track} but found ${data.tracks.items[0].title} which is not contained in the full track name, track hasn't been added`);
-      }
+      // if (!track.toLowerCase().includes(data.tracks.items[0].title.toLowerCase())) {
+      //   throw new Error(`Looked for ${track} but found ${data.tracks.items[0].title} which is not contained in the full track name, track hasn't been added`);
+      // }
 
       // optimistic approach - the first result is probably the correct track
       return data.tracks.items[0].id;
     } catch (e) {
       console.log(`${track} - ${e}`);
+      failedIDRequests.push(track);
     }
   }));
 }
@@ -66,20 +67,29 @@ function getSuccessfulIDResults(results: PromiseSettledResult<any>[]) {
   }, []);
 }
 
+async function getTracksInCollection() {
+  const response = await fetch(URLS.collectionAPIURL(), {
+    headers: headersWithToken(),
+  });
+  const data = await response.json();
+
+  const trackIdsInCollection = data.items.map((track: any) => track.item.id);
+  
+  return new Set(trackIdsInCollection);
+}
+
 async function addToCollection(trackIds: number[]) {
   return Promise.allSettled(trackIds.map(async (trackId) => {
     try {
-      const response = await fetch(URLS.addToCollection(), {
+      await fetch(URLS.addToCollection(), {
         method: 'POST',
         // wtf is wrong with you tidal backend devs?
         body: `trackIds=${trackId}&onArtifactNotFound=FAIL`,
         headers: headersWithToken(),
       });
       // api responds with an empty 200
-      // const data = await response.json();
       console.log(`added ${trackId} to collection`);
 
-      // return data;
     } catch (e) {
       console.log(e);
       
@@ -91,11 +101,22 @@ async function addToCollection(trackIds: number[]) {
 (async () => {
   const trackList = await getTrackList();
   const trackIDs = await getTrackIds(trackList);
-
+  const tracksInCollectionSet = await getTracksInCollection();
+  console.log(`Got ${trackIDs.length} track ID responses`);
+  
   const failedTrackIDRequests = trackIDs.filter(item => item.status === 'rejected');
   console.log(`Failed to get ID for ${failedTrackIDRequests.length} tracks`);
   await writeFile('./failed-additions', JSON.stringify(failedTrackIDRequests), 'utf8');
-  
+
   const successfulTrackIDRequests = getSuccessfulIDResults(trackIDs);
-  await addToCollection(successfulTrackIDRequests);
+  console.log(`Found ${successfulTrackIDRequests.length} tracks`);
+
+  console.log(`Filtering out ${tracksInCollectionSet.size} tracks that are already in collection`);
+  const filteredIDs = successfulTrackIDRequests.filter(item => !tracksInCollectionSet.has(item));
+  console.log(`Found ${filteredIDs.length} tracks that are not in collection`);
+  
+  await addToCollection(filteredIDs);
+
+  console.log(`Failed to get IDs for ${failedIDRequests.length} tracks, see ./failedIDRequests for the name list`);
+  await writeFile('./failedIDRequests.json', JSON.stringify(failedIDRequests), 'utf-8');
 })();
