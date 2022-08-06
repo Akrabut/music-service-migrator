@@ -8,7 +8,7 @@
 
 ## Data origins
 
-(Manual scraping of web version)[listen.tidal.com]
+[Manual scraping of web version](listen.tidal.com)
 
 ### How to get your token
 
