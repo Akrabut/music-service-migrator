@@ -1,0 +1,18 @@
+"https://listen.tidal.com/v1/users/186299160/favorites/tracks?countryCode=IL&locale=en_US&deviceType=BROWSER", {
+  "credentials": "include",
+  "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:103.0) Gecko/20100101 Firefox/103.0",
+    "Accept": "*/*",
+    "Accept-Language": "he,en-US;q=0.7,en;q=0.3",
+    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "Sec-GPC": "1",
+    "authorization": "HEHE you thought you were smart",
+  },
+  "referrer": "https://listen.tidal.com/album/3514683/track/3514687",
+  "body": "trackIds=3514687&onArtifactNotFound=FAIL",
+  "method": "POST",
+  "mode": "cors"
+});
