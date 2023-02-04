@@ -1,0 +1,1 @@
+export const removeFileExtensions = (list: string[]) => list.map(item => item.replace(/\.(mp3|MP3|wma|flac|wav)/, ''));
