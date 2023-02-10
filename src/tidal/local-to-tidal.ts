@@ -1,7 +1,7 @@
 import { getLocalTrackList } from '../local/get-local-tracks';
-import { getTrackIds, getTracksInCollection } from './get-tracks';
-import { filterFailedIDResults } from './utils';
-import { addToCollection } from './add-to-collection';
+import { getTrackIds, getTracksInCollection } from './network/get-tracks';
+import { filterFailedIDResults } from './utils/filter-results';
+import { addToCollection } from './network/add-to-collection';
 import { persistErrors } from '../shared-utils/persist-errors';
 
 const failedIDRequests: string[] = [];

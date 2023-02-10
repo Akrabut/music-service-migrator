@@ -1,12 +1,11 @@
-import { headersWithToken } from './utils';
+import { headersWithToken } from '../utils/filter-results';
 import { URLS } from './urls';
-import { TOKEN } from './constants';
 
 export async function getTrackIds(trackList: string[], failedIDRequests: string[]) {
   return Promise.allSettled(trackList.map(async (track) => {
     try {
-      const response = await fetch(URLS.tidalSearchAPIURL(track), {
-        headers: headersWithToken(TOKEN),
+      const response = await fetch(URLS.searchAPIURL(track), {
+        headers: headersWithToken(),
       });
       const data = await response.json();
 
@@ -25,7 +24,7 @@ export async function getTrackIds(trackList: string[], failedIDRequests: string[
 
 export async function getTracksInCollection() {
   const response = await fetch(URLS.collectionAPIURL(), {
-    headers: headersWithToken(TOKEN),
+    headers: headersWithToken(),
   });
   const data = await response.json();
 

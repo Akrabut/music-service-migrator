@@ -21,7 +21,10 @@
   },
   "homepage": "https://github.com/Akrabut/local-tracks-to-tidal#readme",
   "dependencies": {
-    "@types/node": "^18.6.4"
+    "@types/node": "^18.13.0"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
 }
