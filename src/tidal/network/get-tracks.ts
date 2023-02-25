@@ -1,12 +1,10 @@
-import { headersWithToken } from '../utils/filter-results';
-import { URLS } from './urls';
+import { fetchWithHeaders } from '../../shared-utils/fetch-with-headers';
+import { URLs } from './urls';
 
 export async function getTrackIds(trackList: string[], failedIDRequests: string[]) {
   return Promise.allSettled(trackList.map(async (track) => {
     try {
-      const response = await fetch(URLS.searchAPIURL(track), {
-        headers: headersWithToken(),
-      });
+      const response = await fetchWithHeaders(URLs.searchAPIURL(track), 'tidal');
       const data = await response.json();
 
       // if (!track.toLowerCase().includes(data.tracks.items[0].title.toLowerCase())) {
@@ -23,12 +21,16 @@ export async function getTrackIds(trackList: string[], failedIDRequests: string[
 }
 
 export async function getTracksInCollection() {
-  const response = await fetch(URLS.collectionAPIURL(), {
-    headers: headersWithToken(),
-  });
+  const response = await fetchWithHeaders(URLs.collectionAPIURL(), 'tidal');
   const data = await response.json();
-
   const trackIdsInCollection = data.items.map((track: any) => track.item.id);
 
-  return new Set(trackIdsInCollection);
+  return new Set(trackIdsInCollection as string[]);
+}
+
+export async function getTracksWithArtistsFromCollection() {
+  const response = await fetchWithHeaders(URLs.collectionAPIURL(), 'tidal');
+  const data = await response.json();
+
+  return data.items.map((track: any) => `${track.item.artist.name} - ${track.item.title}`);
 }

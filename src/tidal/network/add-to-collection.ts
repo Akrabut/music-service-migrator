@@ -1,15 +1,10 @@
-import { headersWithToken } from '../utils/filter-results';
-import { URLS } from './urls';
+import { fetchWithHeaders } from '../../shared-utils/fetch-with-headers';
+import { URLs } from './urls';
 
 export async function addToCollection(trackIds: number[]) {
   return Promise.allSettled(trackIds.map(async (trackId) => {
     try {
-      await fetch(URLS.addToCollection(), {
-        method: 'POST',
-        // wtf is wrong with you tidal backend devs?
-        body: `trackIds=${trackId}&onArtifactNotFound=FAIL`,
-        headers: headersWithToken(),
-      });
+      await fetchWithHeaders(URLs.addToCollection(), 'tidal', 'POST', `trackIds=${trackId}&onArtifactNotFound=FAIL`);
       // api responds with an empty 200
       console.log(`added ${trackId} to collection`);
 

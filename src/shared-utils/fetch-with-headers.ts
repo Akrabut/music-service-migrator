@@ -9,8 +9,10 @@ const getHeaders = (service: 'spotify' | 'tidal') => {
   }
 };
 
-export async function fetchWithHeaders(url: string, service: 'spotify' | 'tidal') {
+export async function fetchWithHeaders(url: string, service: 'spotify' | 'tidal', method?: 'PUT' | 'POST', body?: any) {
   return fetch(url, {
+    method: method ?? 'GET',
     headers: getHeaders(service),
+    body: body ?? null,
   });
 }

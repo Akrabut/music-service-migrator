@@ -1,5 +1,5 @@
 node_modules
 **failed-id-requests
 **failed-additions
-**/secrets
+.*secrets.*
 src/dist
