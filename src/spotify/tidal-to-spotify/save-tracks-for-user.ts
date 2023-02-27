@@ -4,9 +4,9 @@ import { URLs } from '../network/urls';
 async function save50Tracks(trackIds: string[]) {
   const url = URLs.saveTracksForCurrentUser();
   const response = await fetchWithHeaders(url, 'spotify', 'PUT', JSON.stringify({ ids: trackIds }));
-  const data = await response.json();
+  // const data = await response.json();
 
-  return data;
+  return response;
 }
 
 
@@ -18,6 +18,8 @@ export async function saveTracksForCurrentUser(trackIds: string[]) {
   }
   
   const responses = await Promise.all(saveTasks);
+  
+  const successfulResponses = responses.filter(res => res.ok);
 
-  console.log(`Saved up to ${50 * responses.length} tracks for current user`);
+  console.log(`Saved up to ${50 * successfulResponses.length} tracks for current user`);
 }
